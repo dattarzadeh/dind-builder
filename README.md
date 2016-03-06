@@ -40,7 +40,7 @@ Jenkins Build Slave
 * Configure a new docker cloud in your Jenkins settings (Manage Jenkins->Configure System)
  * Give it a name and a valid docker URL like http://my.docker.host:2375
  * Test the connection
- * Add this image from the public registry to that cloud with the ID: ocedo/dind
+ * Add this image from the public registry to that cloud with the ID: m1no/dind-builder
  * Give that image a valid build label (ex.:"docker") to point your build jobs to it
  * Select the newly created credential from before to allow the Jenkins Master to connect
    via ssh to the new Docker Jenkins slave
@@ -60,7 +60,7 @@ Bamboo Agent
 -----
 Example command to run a volatile Bamboo Agent with token based authentication.
 ```
-docker run --privileged --rm -ti -e BAMBOO_AUTOSTART=1 -e BAMBOO_AGENT_INSTALLER_URL=http://bamboo.example.com/agentServer/agentInstaller/atlassian-bamboo-agent-installer-5.10.1.1.jar -e BAMBOO_TOKEN=403a5fd4v89b6b33ff46805a6529e9016e015612 -e BAMBOO_SERVER_URL=http://bamboo.example.com/agentServer/ dind
+docker run --privileged --rm -ti -e BAMBOO_AUTOSTART=1 -e BAMBOO_AGENT_INSTALLER_URL=http://bamboo.example.com/agentServer/agentInstaller/atlassian-bamboo-agent-installer-5.10.1.1.jar -e BAMBOO_TOKEN=403a5fd4v89b6b33ff46805a6529e9016e015612 -e BAMBOO_SERVER_URL=http://bamboo.example.com/agentServer/ m1no/dind-builder
 ```
 
 Environment Variables
