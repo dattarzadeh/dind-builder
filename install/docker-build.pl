@@ -35,7 +35,7 @@ my @tags;
 my $replace_from;
 
 # Defaults
-my $dockercmd = "docker -H 0.0.0.0:2376";
+my $dockercmd = "docker";
 
 # Read CLI options
 my $c = GetOptions(
