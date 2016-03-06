@@ -44,7 +44,6 @@ Jenkins Build Slave
  * Give that image a valid build label (ex.:"docker") to point your build jobs to it
  * Select the newly created credential from before to allow the Jenkins Master to connect
    via ssh to the new Docker Jenkins slave
- * Set a environment variable ```JENKINS_AUTOSTART=1```
  * Click the "Advanced..." button for that image
  * Enable "Run container privileged" mode
 * Create a new build job and set the option "Restrict where this project can be run" to
@@ -72,7 +71,6 @@ Environment Variables
 | ENV VARIABLE | FUNCTION |
 | ------------ | -------- |
 | ```DOCKER_DAEMON_AUTOSTART``` | Default: ```1```. If set to 1 the docker daemon is starting inside the docker container. |
-| ```JENKINS_AUTOSTART``` | Default: ```0```. This should be set to 1 if you want to run this container as a JENKINS build slave. |
 | ```BAMBOO_AUTOSTART``` | Default: ```0```. This should be set to 1 if you want to run this container as a BAMBOO build agent. This requires the environment variables ```BAMBOO_SERVER_URL``` and ```BAMBOO_AGENT_INSTALLER_URL``` to be set. |
 | ```BAMBOO_SERVER_URL``` | Default:```""```. This variable determines the BAMBOO server url. <br><br>Format example: ```http://bamboo.example.com/agentServer/``` |
 | ```BAMBOO_AGENT_INSTALLER_URL``` | Default:```""```. This variable determines the BAMBOO download url for the agent. <br>Your URL is available under: <br> Bamboo Administration > Agents > Install Remote Agent <br> behind the download button.  <br><br>Format example: ```http://bamboo.example.com/agentServer/agentInstaller/atlassian-bamboo-agent-installer-5.10.1.1.jar``` |

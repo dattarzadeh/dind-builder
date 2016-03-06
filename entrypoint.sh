@@ -8,7 +8,6 @@ fi
 # If a cmd argument is defined in docker run <container> <cmd>
 if [ -n "$1" ]; then
 
-  echo "Skipping autostarts!"
   exec "$@"
 
 # Otherwise start the bamboo agent if set
@@ -40,10 +39,4 @@ elif [ "$BAMBOO_AUTOSTART" = '1' ]; then
 
   # Installs and runs the bamboo agent, if he dies he automatically restarts
   exec /usr/bin/java -Dbamboo.home=$BAMBOO_AGENT_HOME -jar $BAMBOO_AGENT_INSTALLER $BAMBOO_AGENT_ARGS
-
-# Or start the SSH server which jenkins needs
-elif [ "$JENKINS_AUTOSTART" = '1' ]; then
-
-  exec /usr/sbin/sshd -D
-
 fi
