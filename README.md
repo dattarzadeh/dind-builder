@@ -63,6 +63,10 @@ Example command to run a volatile Bamboo Agent with token based authentication.
 docker run --privileged --rm -ti -e BAMBOO_AUTOSTART=1 -e BAMBOO_AGENT_INSTALLER_URL=http://bamboo.example.com/agentServer/agentInstaller/atlassian-bamboo-agent-installer-5.10.1.1.jar -e BAMBOO_TOKEN=403a5fd4v89b6b33ff46805a6529e9016e015612 -e BAMBOO_SERVER_URL=http://bamboo.example.com/agentServer/ m1no/dind-builder
 ```
 
+Known Issues
+-----
+* The token based authentication does not seem to work, you still need manual approval on the Bamboo server site. A support ticket at Atlassian was already opened for that. No response yet.
+
 Environment Variables
 -----
 | ENV VARIABLE | FUNCTION |
