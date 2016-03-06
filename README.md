@@ -60,7 +60,7 @@ Bamboo Agent
 -----
 Example command to run a volatile Bamboo Agent with token based authentication.
 ```
-docker run --privileged --rm -ti -e BAMBOO_AUTOSTART=1 -e BAMBOO_AGENT_INSTALLER_URL=http://bamboo.example.com/agentServer/agentInstaller/atlassian-bamboo-agent-installer-5.10.1.1.jar -e BAMBOO_TOKEN=403a5fd4v89b6b33ff46805a6529e9016e015612 -e BAMBOO_SERVER=http://bamboo.example.com/agentServer/ dind```
+docker run --privileged --rm -ti -e BAMBOO_AUTOSTART=1 -e BAMBOO_AGENT_INSTALLER_URL=http://bamboo.example.com/agentServer/agentInstaller/atlassian-bamboo-agent-installer-5.10.1.1.jar -e BAMBOO_TOKEN=403a5fd4v89b6b33ff46805a6529e9016e015612 -e BAMBOO_SERVER_URL=http://bamboo.example.com/agentServer/ dind```
 
 Environment Variables
 -----
