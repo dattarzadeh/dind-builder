@@ -1,5 +1,5 @@
 FROM ubuntu:latest
-MAINTAINER Julian Klinck <git@lab10.de>
+MAINTAINER Jan Zenkner <jan.zenkner@riverbed.com>
 
 # Stops apt-get from complaining about automated installation of packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -15,11 +15,6 @@ RUN locale-gen en_US.UTF-8
 
 # The SSH server needs that to startup
 RUN mkdir -p /var/run/sshd
-
-# Jenkins build agent (master provisions it via SSH) requirements
-RUN adduser --disabled-password --gecos "" jenkins
-RUN echo "jenkins:jenkins" | chpasswd
-RUN echo "jenkins ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/jenkins
 
 # Bamboo build agent requirements
 ENV BAMBOO_AGENT_INSTALLER /opt/bamboo-agent.jar
@@ -46,9 +41,9 @@ RUN chmod +x /opt/install/buildenv-firmware.sh && sleep 1 && /opt/install/builde
 # Docker-in-Docker
 # Configuration parameters
 ENV DOCKER_BUCKET get.docker.com
-ENV DOCKER_VERSION 1.10.2
-ENV DOCKER_SHA256 3fcac4f30e1c1a346c52ba33104175ae4ccbd9b9dbb947f56a0a32c9e401b768
-ENV DOCKER_COMPOSE_VERSION 1.6.2
+ENV DOCKER_VERSION 1.11.1
+ENV DOCKER_SHA256 893e3c6e89c0cd2c5f1e51ea41bc2dd97f5e791fcfa3cee28445df277836339d
+ENV DOCKER_COMPOSE_VERSION 1.7.1
 ENV DIND_COMMIT 3b5fac462d21ca164b3778647420016315289034
 
 # Install docker-compose
@@ -61,12 +56,23 @@ RUN chmod +x /usr/local/bin/docker-build
 
 # Install docker binary and set the right docker socket permissions for the group docker
 # Source: https://github.com/docker-library/docker/blob/8d8a46bbe4c018a262df473d844d548689787d6e/1.10/Dockerfile
-RUN curl -fSL "https://${DOCKER_BUCKET}/builds/Linux/x86_64/docker-$DOCKER_VERSION" -o /usr/local/bin/docker \
-  && echo "${DOCKER_SHA256}  /usr/local/bin/docker" | sha256sum -c - \
+RUN curl -fSL "https://${DOCKER_BUCKET}/builds/Linux/x86_64/docker-$DOCKER_VERSION.tgz" -o docker.tgz \
+  && echo "${DOCKER_SHA256}  docker.tgz" | sha256sum -c - \
+  && tar -xzvf docker.tgz \
+  && mv docker/* /usr/local/bin/ \
+  && rmdir docker \
+  && rm docker.tgz \
+  && docker -v \ 
   && chmod +x /usr/local/bin/docker
+
 RUN groupadd docker
 RUN touch /var/run/docker.sock \
   && chown root:docker /var/run/docker.sock
+
+# Jenkins build agent (master provisions it via SSH) requirements
+RUN adduser --disabled-password --gecos "" jenkins
+RUN echo "jenkins:jenkins" | chpasswd
+RUN echo "jenkins ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/jenkins
 
 # Allow jenkins to access the docker daemon
 RUN gpasswd -a jenkins docker
@@ -75,6 +81,7 @@ RUN gpasswd -a jenkins docker
 # Source: https://github.com/docker-library/docker/blob/8d8a46bbe4c018a262df473d844d548689787d6e/1.10/dind/Dockerfile
 RUN wget "https://raw.githubusercontent.com/docker/docker/${DIND_COMMIT}/hack/dind" -O /usr/local/bin/dind \
   && chmod +x /usr/local/bin/dind
+
 
 # By default we want the container to start the docker daemon inside our container
 ENV DOCKER_DAEMON_AUTOSTART 1

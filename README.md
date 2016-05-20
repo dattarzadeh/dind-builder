@@ -7,9 +7,9 @@ This docker container is intended to be used together with either the
 
 Software Content
 -----
-* Ubuntu 14.04
-* Docker 1.10.2
-* Docker Compose 1.6.2
+* Ubuntu 16.04
+* Docker 1.11.1
+* Docker Compose 1.7.1
 * Docker Build Helper 1.0
 * OpenSSH Server
 * OpenJDK 8
