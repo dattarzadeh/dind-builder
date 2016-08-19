@@ -20,7 +20,12 @@ elif [ "$BAMBOO_AUTOSTART" = '1' ]; then
 
   # Add addional capabilties if env var is set
   if [ -n "$BAMBOO_CAPABILITIES" ]; then
-    printf $BAMBOO_CAPABILITIES >> $BAMBOO_AGENT_HOME/$BAMBOO_CAPABILITIES_FILE
+    OIFS=$IFS
+    IFS=';'
+    for i in $BAMBOO_CAPABILITIES; do
+      echo $i >> $BAMBOO_AGENT_HOME/$BAMBOO_CAPABILITIES_FILE
+    done
+    IFS=$OIFS
   fi
 
   if [ -z "$BAMBOO_AGENT_INSTALLER_URL" ]; then
