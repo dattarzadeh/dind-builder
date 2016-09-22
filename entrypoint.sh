@@ -27,6 +27,11 @@ elif [ "$BAMBOO_AUTOSTART" = '1' ]; then
   fi
 
   # SSH
+  if [ -d '/mnt/ssh/' ]; then
+    # Copy files - We should not fiddle with files eventually mounted in
+    mkdir -p '/root/.ssh'
+    cp -rf '/mnt/ssh/*' '/root/.ssh/'
+  fi
   if [ -d '/root/.ssh/' ]; then
     # Fix possibly incorrect permissions
     chown -R root:root '/root/.ssh/'
