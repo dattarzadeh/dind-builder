@@ -20,8 +20,9 @@ elif [ "$BAMBOO_AUTOSTART" = '1' ]; then
 
   # Customize config
   if [ -n "$BAMBOO_NAME" ] && [ -n "$HOSTNAME" ]; then
-    sed -i "s/<name><\/name>/<name>$BAMBOO_NAME ($HOSTNAME)<\/name>/g" $BAMBOO_CONFIG_FILE
-    sed -i "s/<description><\/description>/<description>Bamboo Build Agent $BAMBOO_NAME, Docker Container $HOSTNAME<\/description>/g" $BAMBOO_CONFIG_FILE
+    sed -i "s#<buildWorkingDirectory></buildWorkingDirectory>#<buildWorkingDirectory>$BAMBOO_AGENT_HOME/xml-data/build-dir</buildWorkingDirectory>#g" $BAMBOO_CONFIG_FILE
+    sed -i "s#<name></name>#<name>$BAMBOO_NAME ($HOSTNAME)</name>#g" $BAMBOO_CONFIG_FILE
+    sed -i "s#<description></description>#<description>Bamboo Build Agent $BAMBOO_NAME in Docker Container $HOSTNAME</description>#g" $BAMBOO_CONFIG_FILE
   else
     rm $BAMBOO_CONFIG_FILE
   fi
@@ -30,7 +31,7 @@ elif [ "$BAMBOO_AUTOSTART" = '1' ]; then
   if [ -d '/mnt/ssh/' ]; then
     # Copy files - We should not fiddle with files eventually mounted in
     mkdir -p '/root/.ssh'
-    cp -rf '/mnt/ssh/*' '/root/.ssh/'
+    cp -rf /mnt/ssh/* '/root/.ssh/'
   fi
   if [ -d '/root/.ssh/' ]; then
     # Fix possibly incorrect permissions
@@ -60,8 +61,9 @@ elif [ "$BAMBOO_AUTOSTART" = '1' ]; then
     IFS=$OIFS
   fi
 
-  # Remove possible blank lines
+  # Remove possible blank and duplicate lines
   sed -i '/^\s*$/d' $BAMBOO_CAPABILITIES_FILE
+  sort -u $BAMBOO_CAPABILITIES_FILE
 
   if [ -z "$BAMBOO_AGENT_INSTALLER_URL" ]; then
     echo "No BAMBOO_AGENT_INSTALLER_URL provided. Format ex.: http://bamboo.example.com/agentServer/agentInstaller/atlassian-bamboo-agent-installer-latest.jar. Exiting..."
