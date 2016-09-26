@@ -2,7 +2,8 @@
 set -e
 
 if [ "$DOCKER_DAEMON_AUTOSTART" = '1' ]; then
-  /usr/local/bin/dind docker daemon -H 0.0.0.0:2375 -H unix:///var/run/docker.sock $DOCKER_DAEMON_ARGS &> /var/log/docker.log &
+  rm -f /var/run/docker.pid
+  /usr/local/bin/dind docker daemon -H 0.0.0.0:2375 -H unix:///var/run/docker.sock $DOCKER_DAEMON_ARGS >> /var/log/docker.log 2>&1 &
 fi
 
 # If a cmd argument is defined in docker run <container> <cmd>
