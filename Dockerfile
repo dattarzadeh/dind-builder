@@ -23,6 +23,7 @@ ENV BAMBOO_CAPABILITIES_FILE=$BAMBOO_AGENT_HOME/bin/bamboo-capabilities.properti
 ADD bamboo/bamboo-capabilities.properties $BAMBOO_CAPABILITIES_FILE
 ENV BAMBOO_CONFIG_FILE $BAMBOO_AGENT_HOME/bamboo-agent.cfg.xml
 ADD bamboo/bamboo-agent.cfg.xml $BAMBOO_CONFIG_FILE
+ADD bamboo/clearAgentSpace.sh $BAMBOO_AGENT_HOME
 # Ubuntu 14.04 does not have openjdk-8 by default
 RUN apt-get install -y --no-install-recommends software-properties-common \
   && add-apt-repository ppa:openjdk-r/ppa \
