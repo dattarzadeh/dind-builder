@@ -15,7 +15,7 @@ if [ -n "$1" ]; then
 elif [ "$BAMBOO_AUTOSTART" = '1' ]; then
 
   if [ -z "$BAMBOO_SERVER_URL" ]; then
-    echo "No BAMBOO_SERVER_URL provided. Format ex.: http://bamboo.example.com/agentServer/. Exiting..."
+    echo "No BAMBOO_SERVER_URL provided. Format ex.: http://bamboo.example.com. Exiting..."
     exit 1
   fi
 
@@ -74,10 +74,18 @@ elif [ "$BAMBOO_AUTOSTART" = '1' ]; then
   echo "Downloading bamboo agent"
   curl -L $BAMBOO_AGENT_INSTALLER_URL > $BAMBOO_AGENT_INSTALLER
 
-  BAMBOO_AGENT_ARGS="$BAMBOO_SERVER_URL"
+  BAMBOO_AGENT_ARGS="$BAMBOO_SERVER_URL/agentServer/"
 
   if [ -n "$BAMBOO_TOKEN" ]; then
     BAMBOO_AGENT_ARGS="$BAMBOO_AGENT_ARGS -t $BAMBOO_TOKEN"
+  fi
+
+  # Start endlessly-running cleanup script in background
+  if [ -n "$BAMBOO_API_TOKEN" ]; then
+    $BAMBOO_AGENT_HOME/clearAgentSpace.sh 2>&1 &
+  else
+    echo "No BAMBOO_API_TOKEN provided. Required for disk space housekeeping!"
+    exit 1
   fi
 
   # Installs and runs the bamboo agent, if he dies he automatically restarts

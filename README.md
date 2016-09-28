@@ -59,7 +59,7 @@ Bamboo Agent
 -----
 Example command to run a volatile Bamboo Agent with token based authentication.
 ```
-docker run --privileged --rm -ti -e BAMBOO_AUTOSTART=1 -e BAMBOO_AGENT_INSTALLER_URL=http://bamboo.example.com/agentServer/agentInstaller/atlassian-bamboo-agent-installer-5.10.1.1.jar -e BAMBOO_TOKEN=403a5fd4v89b6b33ff46805a6529e9016e015612 -e BAMBOO_SERVER_URL=http://bamboo.example.com/agentServer/ m1no/dind-builder
+docker run --privileged --rm -ti -e BAMBOO_AUTOSTART=1 -e BAMBOO_AGENT_INSTALLER_URL=http://bamboo.example.com/agentServer/agentInstaller/atlassian-bamboo-agent-installer-latest.jar -e BAMBOO_TOKEN=403a5fd4v89b6b33ff46805a6529e9016e015612 -e BAMBOO_API_TOKEN=e87342d4-8547-11e6-92d0-74d435e4f811 -e BAMBOO_SERVER_URL=http://bamboo.example.com m1no/dind-builder
 ```
 
 Known Issues
@@ -72,7 +72,8 @@ Environment Variables
 | ------------ | -------- |
 | ```DOCKER_DAEMON_AUTOSTART``` | Default: ```1```. If set to 1 the docker daemon is starting inside the docker container. |
 | ```BAMBOO_AUTOSTART``` | Default: ```0```. This should be set to 1 if you want to run this container as a BAMBOO build agent. This requires the environment variables ```BAMBOO_SERVER_URL``` and ```BAMBOO_AGENT_INSTALLER_URL``` to be set. |
-| ```BAMBOO_SERVER_URL``` | Default:```""```. This variable determines the BAMBOO server url. <br><br>Format example: ```http://bamboo.example.com/agentServer/``` |
-| ```BAMBOO_AGENT_INSTALLER_URL``` | Default:```""```. This variable determines the BAMBOO download url for the agent. <br>Your URL is available under: <br> Bamboo Administration > Agents > Install Remote Agent <br> behind the download button.  <br><br>Format example: ```http://bamboo.example.com/agentServer/agentInstaller/atlassian-bamboo-agent-installer-5.10.1.1.jar``` |
+| ```BAMBOO_SERVER_URL``` | Default:```""```. This variable determines the BAMBOO server url. <br><br>Format example: ```http://bamboo.example.com/``` |
+| ```BAMBOO_AGENT_INSTALLER_URL``` | Default:```""```. This variable determines the BAMBOO download url for the agent. <br>Your URL is available under: <br> Bamboo Administration > Agents > Install Remote Agent <br> behind the download button.  <br><br>Format example: ```http://bamboo.example.com/agentServer/agentInstaller/atlassian-bamboo-agent-installer-latest.jar``` |
 | ```BAMBOO_TOKEN``` | Default:```""```. This is only needed if you have token based authentication for your agents activated. <br>Your token is available under: <br>Bamboo Administration > Agents > Install Remote Agent<br> when you have tokens enabled. <br><br>Format example: ```403a5fd4v89b6b33ff46805a6529e9016e015612``` |
+| ```BAMBOO_API_TOKEN``` | Default:```""```. This is needed for automatic cleanup. <br>Your token is available under: <br>Bamboo Administration > Agent APIs Admin > Agent API Tokens<br><br>Format example: ```e87342d4-8547-11e6-92d0-74d435e4f811``` |
 | ```BAMBOO_CAPABILITIES``` | Default:```""```. If you need to add additional BAMBOO capabilities to the agent. Capabilities can be seperated by the <b>;</b>-Delimiter. There are already predefined ones in [bamboo/bamboo-capabilities.properties](bamboo/bamboo-capabilities.properties) <br><br>Format example: ```IOPS=High\nsystem.builder.command.echo=/bin/echo``` |
