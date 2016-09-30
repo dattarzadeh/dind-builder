@@ -1,0 +1,9 @@
+#!/bin/sh
+
+BAMBOO_AGENT_ARGS="${BAMBOO_SERVER_URL}/agentServer/"
+
+if [ -n "${BAMBOO_TOKEN}" ]; then
+  BAMBOO_AGENT_ARGS="${BAMBOO_AGENT_ARGS} -t ${BAMBOO_TOKEN}"
+fi
+
+exec /usr/bin/java -Dbamboo.home=${BAMBOO_AGENT_HOME} -jar ${BAMBOO_AGENT_INSTALLER} $BAMBOO_AGENT_ARGS

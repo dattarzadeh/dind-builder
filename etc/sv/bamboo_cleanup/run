@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec $BAMBOO_AGENT_HOME/clearAgentSpace.sh 2>&1
