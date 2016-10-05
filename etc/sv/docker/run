@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec /usr/local/bin/dind docker daemon --raw-logs -H 0.0.0.0:2375 -H unix:///var/run/docker.sock $DOCKER_DAEMON_ARGS >> /var/log/docker.log 2>&1

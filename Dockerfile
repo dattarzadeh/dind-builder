@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM quay.io/ocedo/baseimage-docker:latest
 MAINTAINER Jan Zenkner <jan.zenkner@riverbed.com>
 
 # Stops apt-get from complaining about automated installation of packages
@@ -9,12 +9,7 @@ RUN apt-get update -qq && apt-get install -y \
     apt-transport-https \
     ca-certificates \
     curl \
-    iptables \
-    openssh-server
-RUN locale-gen en_US.UTF-8
-
-# The SSH server needs that to startup
-RUN mkdir -p /var/run/sshd
+    iptables
 
 # Bamboo build agent requirements
 ENV BAMBOO_AGENT_INSTALLER /opt/bamboo-agent.jar
@@ -80,19 +75,19 @@ RUN echo "jenkins ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/jenkins
 # Allow jenkins to access the docker daemon
 RUN gpasswd -a jenkins docker
 
+# Our Runit services & scripts, managed via entrypoint
+ADD etc/sv/ /etc/sv
+ADD etc/my_init.d/ /etc/my_init.d
+
 # Install the helper script to make docker in docker possible
 # Source: https://github.com/docker-library/docker/blob/8d8a46bbe4c018a262df473d844d548689787d6e/1.10/dind/Dockerfile
 RUN wget "https://raw.githubusercontent.com/docker/docker/${DIND_COMMIT}/hack/dind" -O /usr/local/bin/dind \
   && chmod +x /usr/local/bin/dind
 
-
 # By default we want the container to start the docker daemon inside our container
 ENV DOCKER_DAEMON_AUTOSTART 1
-
-COPY entrypoint.sh /usr/local/bin/
 
 VOLUME /var/lib/docker
 EXPOSE 2375 22
 
-ENTRYPOINT ["entrypoint.sh"]
-CMD []
+CMD ["/sbin/my_init"]
