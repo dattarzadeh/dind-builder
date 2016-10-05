@@ -7,7 +7,7 @@ This docker container is intended to be used together with either the
 
 Software Content
 -----
-* Ubuntu 16.04
+* Ubuntu 14.04.5 LTS
 * Docker 1.11.1
 * Docker Compose 1.7.1
 * Docker Build Helper 1.0
