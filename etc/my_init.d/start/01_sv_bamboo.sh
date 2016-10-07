@@ -8,14 +8,18 @@ if [ "$BAMBOO_AUTOSTART" = '1' ]; then
     false
   fi
 
-  # Customize config
-  sed -i "s#<buildWorkingDirectory></buildWorkingDirectory>#<buildWorkingDirectory>$BAMBOO_AGENT_HOME/xml-data/build-dir</buildWorkingDirectory>#g" $BAMBOO_CONFIG_FILE
+  # New config from template?
+  if [ ! -e $BAMBOO_CONFIG_FILE ]; then
+    cp "$BAMBOO_CONFIG_FILE.tpl" $BAMBOO_CONFIG_FILE
+    sed -i "s#<buildWorkingDirectory>.*</buildWorkingDirectory>#<buildWorkingDirectory>$BAMBOO_AGENT_HOME/xml-data/build-dir</buildWorkingDirectory>#g" $BAMBOO_CONFIG_FILE
+    sed -i "s#<name>.*</name>#<name>DIND ($HOSTNAME)</name>#g" $BAMBOO_CONFIG_FILE
+    sed -i "s#<description>.*</description>#<description>Anonymous Bamboo Build Agent in Docker Container $HOSTNAME (BAMBOO_NAME not set)</description>#g" $BAMBOO_CONFIG_FILE
+  fi
+
+  # Override Agent name?
   if [ -n "$BAMBOO_NAME" ]; then
-    sed -i "s#<name></name>#<name>$BAMBOO_NAME ($HOSTNAME)</name>#g" $BAMBOO_CONFIG_FILE
-    sed -i "s#<description></description>#<description>Bamboo Build Agent $BAMBOO_NAME in Docker Container $HOSTNAME</description>#g" $BAMBOO_CONFIG_FILE
-  else
-    sed -i "s#<name></name>#<name>DIND ($HOSTNAME)</name>#g" $BAMBOO_CONFIG_FILE
-    sed -i "s#<description></description>#<description>Anonymous Bamboo Build Agent in Docker Container $HOSTNAME (BAMBOO_NAME not set)</description>#g" $BAMBOO_CONFIG_FILE
+    sed -i "s#<name>.*</name>#<name>$BAMBOO_NAME ($HOSTNAME)</name>#g" $BAMBOO_CONFIG_FILE
+    sed -i "s#<description>.*</description>#<description>Bamboo Build Agent $BAMBOO_NAME in Docker Container $HOSTNAME</description>#g" $BAMBOO_CONFIG_FILE
   fi
 
   # SSH
