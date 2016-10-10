@@ -86,11 +86,14 @@ while [ true ]; do
 				echo "$(date): * Workdir ${buildWorkingDir}"
 				rm -rf ${buildWorkingDir}
 
-				echo "$(date): * Docker containers, images, volumes"
-				docker ps -a -q | xargs -r docker rm -f -v
-				docker images -q | xargs -r docker rmi -f
-				docker volume ls -q | xargs -r docker volume rm
-				docker volume ls -q -f dangling=true | xargs -r docker volume rm
+				sv status docker | grep -P '^ok:' > /dev/null 2>&1
+				if [ "$?" == "0" ]; then
+					echo "$(date): * Docker containers, images, volumes"
+					docker ps -a -q | xargs -r docker rm -f -v
+					docker images -q | xargs -r docker rmi -f
+					docker volume ls -q | xargs -r docker volume rm
+					docker volume ls -q -f dangling=true | xargs -r docker volume rm
+				fi
 
 				echo "$(date): Disk clear activities complete"
 
