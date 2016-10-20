@@ -4,4 +4,5 @@ set -o pipefail
 
 apt-get install -y \
 pxz \
-git
+git \
+s3cmd
