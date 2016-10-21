@@ -86,13 +86,20 @@ while [ true ]; do
 				echo "$(date): * Workdir ${buildWorkingDir}"
 				rm -rf ${buildWorkingDir}
 
-				sv status docker | grep -P '^ok:' > /dev/null 2>&1
+				sv status docker | grep -P '^run: docker' > /dev/null 2>&1
 				if [ "$?" == "0" ]; then
 					echo "$(date): * Docker containers, images, volumes"
-					docker ps -a -q | xargs -r docker rm -f -v
-					docker images -q | xargs -r docker rmi -f
-					docker volume ls -q | xargs -r docker volume rm
-					docker volume ls -q -f dangling=true | xargs -r docker volume rm
+					# Fuck the system!
+					# There seems to be a Docker bug that causes layers not being deleted properly
+					# https://github.com/docker/docker/issues/6354
+					# Therefore, don't use docker to cleanup itself but kill its storage
+					#docker ps -a -q | xargs -r docker rm -f -v
+					#docker images -q | xargs -r docker rmi -f
+					#docker volume ls -q | xargs -r docker volume rm
+					#docker volume ls -q -f dangling=true | xargs -r docker volume rm
+					sv stop docker
+					rm -rf /var/lib/docker/*
+					sv start docker
 				fi
 
 				echo "$(date): Disk clear activities complete"
