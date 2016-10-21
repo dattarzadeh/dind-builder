@@ -29,8 +29,8 @@ while [ true ]; do
 		buildWorkingDir=`cat ${agentLocation}/bamboo-agent.cfg.xml | grep -oPm1 "(?<=<buildWorkingDirectory>)[^<]+"`
 		agentStatusPrevious="unknown"
 
-		# Cleanup needed?
-		if [ -e "$buildWorkingDir" ]; then
+		# Cleanup needed when builddir not empty
+		if [ ! $(find ${buildWorkingDir} -maxdepth 0 -type d -empty) ]; then
 			echo "$(date): -= Bamboo Agent Cleanup =-"
 
 			# Check if both variables are not null
@@ -84,7 +84,7 @@ while [ true ]; do
 				echo "$(date): Agent is disabled and idle, starting cleanup"
 
 				echo "$(date): * Workdir ${buildWorkingDir}"
-				rm -rf ${buildWorkingDir}
+				rm -rf ${buildWorkingDir}/*
 
 				sv status docker | grep -P '^run: docker' > /dev/null 2>&1
 				if [ "$?" == "0" ]; then
