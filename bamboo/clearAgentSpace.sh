@@ -30,7 +30,8 @@ while [ true ]; do
 		agentStatusPrevious="unknown"
 
 		# Cleanup needed when builddir not empty
-		if [ ! $(find ${buildWorkingDir} -maxdepth 0 -type d -empty) ]; then
+		find ${buildWorkingDir} -maxdepth 0 -type d -empty > /dev/null 2>&1
+		if [ "$?" == "0" ]; then
 			echo "$(date): -= Bamboo Agent Cleanup =-"
 
 			# Check if both variables are not null
