@@ -88,6 +88,8 @@ RUN wget "https://raw.githubusercontent.com/docker/docker/${DIND_COMMIT}/hack/di
 ENV DOCKER_DAEMON_AUTOSTART 1
 
 VOLUME /var/lib/docker
+VOLUME /root
+
 EXPOSE 2375 22
 
 CMD ["/sbin/my_init"]
