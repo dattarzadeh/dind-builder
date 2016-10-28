@@ -5,4 +5,6 @@ set -o pipefail
 apt-get install -y \
 pxz \
 git \
-s3cmd
+python-pip
+
+yes | pip install awscli
