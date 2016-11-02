@@ -49,6 +49,22 @@ if [ "$BAMBOO_AUTOSTART" = '1' ]; then
     set -e
   fi
 
+  # Local cache
+  if [ -d '/mnt/cache/' ]; then
+    set +e
+
+    # Copy files - We should not fiddle with files eventually mounted in
+    mkdir -p '/opt/cache/'
+    cp -rf /mnt/cache/* '/opt/cache/'
+
+    # Fix possibly incorrect permissions
+    chown -R root:root '/opt/cache/'
+    find /opt/cache/ -type d -print0 | xargs -0 chmod 755
+    find /opt/cache/ -type f -print0 | xargs -0 chmod 644
+
+    set -e
+  fi
+
   # Agent Capabilities
   OIFS=$IFS
   IFS=';'
