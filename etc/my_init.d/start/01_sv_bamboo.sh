@@ -9,7 +9,7 @@ if [ "$BAMBOO_AUTOSTART" = '1' ]; then
   fi
 
   # Get our container scale num from parent Docker
-  SCALE=`DOCKER_HOST="unix:///var/run/docker_parent.sock" docker inspect $(hostname) 2> /dev/null | perl -ne '/buildagent_bamboo_(\d+)/ && print $1 ? $1 : 1'`
+  SCALE=`DOCKER_HOST="unix:///var/run/docker_parent.sock" docker inspect $(hostname) 2> /dev/null | perl -ne '/bamboo_(\d+)/ && print $1 ? $1 : 1'`
 
   # New config from template?
   if [ ! -e $BAMBOO_CONFIG_FILE ]; then
