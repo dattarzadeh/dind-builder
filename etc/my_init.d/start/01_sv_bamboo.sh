@@ -8,18 +8,29 @@ if [ "$BAMBOO_AUTOSTART" = '1' ]; then
     false
   fi
 
+  # Get our container scale num from parent Docker
+  SCALE=`DOCKER_HOST="unix:///var/run/docker_parent.sock" docker inspect $(hostname) 2> /dev/null | perl -ne '/buildagent_bamboo_(\d+)/ && print $1 ? $1 : 1'`
+
   # New config from template?
   if [ ! -e $BAMBOO_CONFIG_FILE ]; then
-    cp "$BAMBOO_CONFIG_FILE.tpl" $BAMBOO_CONFIG_FILE
-    sed -i "s#<buildWorkingDirectory>.*</buildWorkingDirectory>#<buildWorkingDirectory>$BAMBOO_AGENT_HOME/xml-data/build-dir</buildWorkingDirectory>#g" $BAMBOO_CONFIG_FILE
-    sed -i "s#<name>.*</name>#<name>DIND ($HOSTNAME)</name>#g" $BAMBOO_CONFIG_FILE
-    sed -i "s#<description>.*</description>#<description>Anonymous Bamboo Build Agent in Docker Container $HOSTNAME (BAMBOO_NAME not set)</description>#g" $BAMBOO_CONFIG_FILE
+    # Store config on host?
+    if [ -d '/mnt/cfg/' ]; then
+      ln -s "/mnt/cfg/bamboo-agent-$SCALE.cfg.xml" "$BAMBOO_CONFIG_FILE"
+      if [ ! -e "/mnt/cfg/bamboo-agent-$SCALE.cfg.xml" ]; then
+        cat "$BAMBOO_CONFIG_FILE.tpl" > "/mnt/cfg/bamboo-agent-$SCALE.cfg.xml"
+      fi
+    else
+      cp "$BAMBOO_CONFIG_FILE.tpl" "$BAMBOO_CONFIG_FILE"
+    fi
+    sed -i --follow-symlinks "s#<buildWorkingDirectory>.*</buildWorkingDirectory>#<buildWorkingDirectory>$BAMBOO_AGENT_HOME/xml-data/build-dir</buildWorkingDirectory>#g" $BAMBOO_CONFIG_FILE
+    sed -i --follow-symlinks "s#<name>.*</name>#<name>DIND ($HOSTNAME)</name>#g" $BAMBOO_CONFIG_FILE
+    sed -i --follow-symlinks "s#<description>.*</description>#<description>Anonymous Bamboo Build Agent in Docker Container $HOSTNAME (BAMBOO_NAME not set)</description>#g" $BAMBOO_CONFIG_FILE
   fi
 
   # Override Agent name?
   if [ -n "$BAMBOO_NAME" ]; then
-    sed -i "s#<name>.*</name>#<name>$BAMBOO_NAME ($HOSTNAME)</name>#g" $BAMBOO_CONFIG_FILE
-    sed -i "s#<description>.*</description>#<description>Bamboo Build Agent $BAMBOO_NAME in Docker Container $HOSTNAME</description>#g" $BAMBOO_CONFIG_FILE
+    sed -i --follow-symlinks "s#<name>.*</name>#<name>$BAMBOO_NAME - \#$SCALE</name>#g" $BAMBOO_CONFIG_FILE
+    sed -i --follow-symlinks "s#<description>.*</description>#<description>Bamboo Build Agent $BAMBOO_NAME in Docker Container $SCALE</description>#g" $BAMBOO_CONFIG_FILE
   fi
 
   # SSH
