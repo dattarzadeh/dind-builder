@@ -67,6 +67,12 @@ RUN groupadd docker
 RUN touch /var/run/docker.sock \
   && chown root:docker /var/run/docker.sock
 
+#Install Ansible
+RUN apt-add-repository ppa:ansible/ansible
+RUN apt-get update -qq && apt-get install -y \
+    software-properties-common \
+    ansible
+
 # Jenkins build agent (master provisions it via SSH) requirements
 RUN adduser --disabled-password --gecos "" jenkins
 RUN echo "jenkins:jenkins" | chpasswd
