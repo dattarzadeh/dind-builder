@@ -90,6 +90,9 @@ ADD etc/my_init.d/ /etc/my_init.d
 RUN wget "https://raw.githubusercontent.com/docker/docker/${DIND_COMMIT}/hack/dind" -O /usr/local/bin/dind \
   && chmod +x /usr/local/bin/dind
 
+# Make bash the default shell
+RUN ln -sf /bin/bash /bin/sh
+
 # By default we want the container to start the docker daemon inside our container
 ENV DOCKER_DAEMON_AUTOSTART 1
 
