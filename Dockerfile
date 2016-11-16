@@ -1,4 +1,4 @@
-FROM quay.io/ocedo/baseimage-docker:latest
+FROM quay.io/ocedo/baseimage-docker:14.04
 MAINTAINER Jan Zenkner <jan.zenkner@riverbed.com>
 
 # Stops apt-get from complaining about automated installation of packages
