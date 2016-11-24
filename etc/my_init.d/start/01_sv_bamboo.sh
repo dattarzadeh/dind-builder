@@ -8,23 +8,44 @@ if [ "$BAMBOO_AUTOSTART" = '1' ]; then
     false
   fi
 
+  if [ -z "$BAMBOO_AGENT_INSTALLER_URL" ]; then
+    echo "No BAMBOO_AGENT_INSTALLER_URL provided. Format ex.: http://bamboo.example.com/agentServer/agentInstaller/atlassian-bamboo-agent-installer-latest.jar. Exiting..."
+    false
+  fi
+
+  echo "Downloading bamboo agent"
+  curl -L $BAMBOO_AGENT_INSTALLER_URL > $BAMBOO_AGENT_INSTALLER
+
+  echo "Installing bamboo agent"
+  BAMBOO_AGENT_ARGS="$BAMBOO_SERVER_URL/agentServer/"
+  if [ -n "$BAMBOO_TOKEN" ]; then
+    BAMBOO_AGENT_ARGS="$BAMBOO_AGENT_ARGS -t $BAMBOO_TOKEN"
+  fi
+  /usr/bin/java -Dbamboo.home=$BAMBOO_AGENT_HOME -jar $BAMBOO_AGENT_INSTALLER $BAMBOO_AGENT_ARGS install
+
+  echo "Customizing bamboo agent wrapper config"
+  sed -i "s#wrapper.java.initmemory=256#wrapper.java.initmemory=512#g" "$BAMBOO_AGENT_HOME/conf/wrapper.conf"
+  sed -i "s#wrapper.java.maxmemory=512#wrapper.java.maxmemory=1024#g" "$BAMBOO_AGENT_HOME/conf/wrapper.conf"
+
+  echo "Customizing bamboo agent config"
   # Get our container scale num from parent Docker
   SCALE=`DOCKER_HOST="unix:///var/run/docker_parent.sock" docker inspect $(hostname) 2> /dev/null | perl -ne '/bamboo_(\d+)/ && print $1 ? $1 : 1'`
 
   # New config from template?
   if [ ! -e $BAMBOO_CONFIG_FILE ]; then
-    # Store config on host?
-    if [ -d '/mnt/cfg/' ]; then
-      ln -s "/mnt/cfg/bamboo-agent-$SCALE.cfg.xml" "$BAMBOO_CONFIG_FILE"
-      if [ ! -e "/mnt/cfg/bamboo-agent-$SCALE.cfg.xml" ]; then
-        cat "$BAMBOO_CONFIG_FILE.tpl" > "/mnt/cfg/bamboo-agent-$SCALE.cfg.xml"
-      fi
-    else
-      cp "$BAMBOO_CONFIG_FILE.tpl" "$BAMBOO_CONFIG_FILE"
+    cp "$BAMBOO_CONFIG_FILE.tpl" "$BAMBOO_CONFIG_FILE"
+
+    # Default Agent name
+    sed -i "s#<name>.*</name>#<name>DIND ($HOSTNAME)</name>#g" $BAMBOO_CONFIG_FILE
+    sed -i "s#<description>.*</description>#<description>Anonymous Bamboo Build Agent in Docker Container $HOSTNAME (BAMBOO_NAME not set)</description>#g" $BAMBOO_CONFIG_FILE
+  fi
+
+  # Store config on host?
+  if [ -d '/mnt/cfg/' ]; then
+    if [ ! -e "/mnt/cfg/bamboo-agent-$SCALE.cfg.xml" ]; then
+      cp "$BAMBOO_CONFIG_FILE" "/mnt/cfg/bamboo-agent-$SCALE.cfg.xml"
     fi
-    sed -i --follow-symlinks "s#<buildWorkingDirectory>.*</buildWorkingDirectory>#<buildWorkingDirectory>$BAMBOO_AGENT_HOME/xml-data/build-dir</buildWorkingDirectory>#g" $BAMBOO_CONFIG_FILE
-    sed -i --follow-symlinks "s#<name>.*</name>#<name>DIND ($HOSTNAME)</name>#g" $BAMBOO_CONFIG_FILE
-    sed -i --follow-symlinks "s#<description>.*</description>#<description>Anonymous Bamboo Build Agent in Docker Container $HOSTNAME (BAMBOO_NAME not set)</description>#g" $BAMBOO_CONFIG_FILE
+    ln -f -s "/mnt/cfg/bamboo-agent-$SCALE.cfg.xml" "$BAMBOO_CONFIG_FILE"
   fi
 
   # Override Agent name?
@@ -62,6 +83,7 @@ if [ "$BAMBOO_AUTOSTART" = '1' ]; then
 
   # Local cache
   if [ -d '/mnt/cache/' ]; then
+    echo "Populating local cache ..."
     set +e
 
     # Copy files - We should not fiddle with files eventually mounted in
@@ -77,6 +99,7 @@ if [ "$BAMBOO_AUTOSTART" = '1' ]; then
   fi
 
   # Agent Capabilities
+  echo "Configuring bamboo agent capabilities"
   OIFS=$IFS
   IFS=';'
   for i in $BAMBOO_CAPABILITIES; do
@@ -86,14 +109,6 @@ if [ "$BAMBOO_AUTOSTART" = '1' ]; then
   # Remove possible blank or duplicate lines
   sed -i '/^\s*$/d' $BAMBOO_CAPABILITIES_FILE
   sort -u $BAMBOO_CAPABILITIES_FILE
-
-  if [ -z "$BAMBOO_AGENT_INSTALLER_URL" ]; then
-    echo "No BAMBOO_AGENT_INSTALLER_URL provided. Format ex.: http://bamboo.example.com/agentServer/agentInstaller/atlassian-bamboo-agent-installer-latest.jar. Exiting..."
-    false
-  fi
-
-  echo "Downloading bamboo agent"
-  curl -L $BAMBOO_AGENT_INSTALLER_URL > $BAMBOO_AGENT_INSTALLER
 
   # Start agent cleanup service?
   rm -f /etc/service/bamboo_cleanup
