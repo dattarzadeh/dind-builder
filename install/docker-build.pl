@@ -75,7 +75,6 @@ if ( $registry && $registry =~ /^([^:\@]+):([^:\@]+)\@([^:\@]+)$/ ) {
 } elsif ( $registry ) {
   die "Invalid registry parameter format! Please specify --registry= \"user:pass\@name\"";
 }
-$registry->{mail} = 'autobuild@ocedo.com' if $registry;
 
 # Check ENV
 die "Missing image name! Either set IMAGE_NAME or specify --image=\"name\"" unless $image;
@@ -202,7 +201,7 @@ sub step {
 
 sub docker_login {
   say ":: Logging in to registry: ".$registry->{name};
-  my $cmd = join(' ', @dockercmd)." login -e \"".$registry->{mail}."\" -u \"".$registry->{user}."\" -p \"".$registry->{pass}."\" ".$registry->{name};
+  my $cmd = join(' ', @dockercmd)." login -u \"".$registry->{user}."\" -p \"".$registry->{pass}."\" ".$registry->{name};
   my $pcmd = $cmd;
   $pcmd =~ s/-p \"[^\"]+\"/-p \"XYZ\"/;
   print_cmd($pcmd);
