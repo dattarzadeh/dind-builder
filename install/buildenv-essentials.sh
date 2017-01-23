@@ -6,4 +6,4 @@ pxz \
 git \
 python-pip
 
-yes | pip install awscli
+yes | pip install awscli jira
