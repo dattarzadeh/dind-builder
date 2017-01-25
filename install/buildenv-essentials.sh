@@ -6,4 +6,4 @@ pxz \
 git \
 python-pip
 
-yes | pip install awscli jira click
+yes | pip install -I packaging appdirs awscli jira click
